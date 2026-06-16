@@ -1,4 +1,6 @@
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+}
 
 * {
     margin: 0;
@@ -93,7 +95,10 @@ nav {
     padding: 60px 8%;
 }
 
-/* LEADERBOARD */
+/* ===========================
+   LEADERBOARD (DESKTOP)
+   =========================== */
+
 .leaderboard {
     background: #171717;
     border-radius: 12px;
@@ -111,6 +116,19 @@ nav {
 .rank {
     color: #ff6a00;
     font-weight: bold;
+}
+
+/* PLAYER */
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-head {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
 }
 
 /* SEARCH */
@@ -156,20 +174,10 @@ nav {
 .ht3 { background: #00c853; color: white; }
 .lt3 { background: #00acc1; color: white; }
 
-/* PLAYER */
-.player-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+/* ===========================
+   ADMIN (optional remove later)
+   =========================== */
 
-.player-head {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-}
-
-/* ADMIN */
 .admin-panel {
     position: fixed;
     bottom: 20px;
@@ -209,12 +217,11 @@ nav {
 }
 
 /* ===========================
-   MOBILE FIX (RESPONSIVE)
+   📱 MOBILE CARD UI (FIXED)
    =========================== */
 
 @media (max-width: 768px) {
 
-    /* NAV stacks nicely */
     nav {
         flex-direction: column;
         height: auto;
@@ -229,7 +236,6 @@ nav {
         gap: 15px;
     }
 
-    /* HERO text scales down */
     .hero h1 {
         font-size: 2.5rem;
     }
@@ -239,23 +245,28 @@ nav {
         min-height: 60vh;
     }
 
-    /* Leaderboard fills screen properly */
     #leaderboard,
     #players {
         padding: 30px 15px;
     }
 
-    .leaderboard {
-        width: 100%;
-        overflow-x: auto;
-    }
-
+    /* ❗ CARD STYLE REPLACEMENT */
     .row {
-        grid-template-columns: 60px 1fr 90px;
-        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #171717;
+        margin: 10px 0;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #222;
+        gap: 10px;
     }
 
-    /* Search box becomes stacked */
+    .player-info {
+        width: 100%;
+    }
+
     .search-box input {
         width: 100%;
         max-width: 280px;
@@ -267,7 +278,6 @@ nav {
         max-width: 280px;
     }
 
-    /* Admin panel (if still present) */
     .admin-panel {
         width: 90%;
         right: 5%;
