@@ -207,3 +207,70 @@ nav {
     color: white;
     cursor: pointer;
 }
+
+/* ===========================
+   MOBILE FIX (RESPONSIVE)
+   =========================== */
+
+@media (max-width: 768px) {
+
+    /* NAV stacks nicely */
+    nav {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    /* HERO text scales down */
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero {
+        padding: 40px 20px;
+        min-height: 60vh;
+    }
+
+    /* Leaderboard fills screen properly */
+    #leaderboard,
+    #players {
+        padding: 30px 15px;
+    }
+
+    .leaderboard {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .row {
+        grid-template-columns: 60px 1fr 90px;
+        font-size: 14px;
+    }
+
+    /* Search box becomes stacked */
+    .search-box input {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .search-box button {
+        margin-top: 10px;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    /* Admin panel (if still present) */
+    .admin-panel {
+        width: 90%;
+        right: 5%;
+        bottom: 10px;
+    }
+}
