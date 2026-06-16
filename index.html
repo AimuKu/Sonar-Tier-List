@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tier List</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- JS -->
     <script defer src="script.js"></script>
-
 </head>
 
 <body>
@@ -47,13 +44,14 @@
 
 </section>
 
-<!-- PLAYERS -->
+<!-- SEARCH -->
 <section id="players">
 
     <h2 class="section-title">Search Player</h2>
 
     <div class="search-box">
-        <input id="playerInput" placeholder="Enter username">
+        <input id="playerInput" placeholder="Enter username"
+               onkeydown="handleSearchKey(event)">
         <button onclick="searchPlayer()">Search</button>
     </div>
 
