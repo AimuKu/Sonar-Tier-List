@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Tier List</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JS -->
+    <script defer src="script.js"></script>
+
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="logo">Tier List</div>
+
+    <div class="links">
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="#players">Players</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <div>
+        <h1>Minecraft Tier List</h1>
+        <p>Ranked players database</p>
+
+        <button class="btn btn-primary" onclick="scrollToLeaderboard()">View Leaderboard</button>
+        <button class="btn btn-secondary" onclick="scrollToPlayers()">Search Players</button>
+    </div>
+</div>
+
+<!-- LEADERBOARD -->
+<section id="leaderboard">
+
+    <h2 class="section-title">
+        Leaderboard (<span id="rankedPlayersCount">0</span>)
+    </h2>
+
+    <div class="leaderboard" id="leaderboardContainer"></div>
+
+</section>
+
+<!-- PLAYERS -->
+<section id="players">
+
+    <h2 class="section-title">Search Player</h2>
+
+    <div class="search-box">
+        <input id="playerInput" placeholder="Enter username">
+        <button onclick="searchPlayer()">Search</button>
+    </div>
+
+    <div id="searchResult" class="search-result"></div>
+
+</section>
+
+</body>
+</html>
