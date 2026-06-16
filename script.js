@@ -1,5 +1,6 @@
+
 // ===========================
-// DATABASE (LOCAL STORAGE)
+// DATABASE
 // ===========================
 
 function getPlayers() {
@@ -21,7 +22,7 @@ function getHead(name) {
 }
 
 // ===========================
-// INIT DATA (FIRST TIME ONLY)
+// INIT DATA
 // ===========================
 
 (function initData() {
@@ -30,7 +31,7 @@ function getHead(name) {
 
     if (!players || Object.keys(players).length === 0) {
 
-        const defaultData = {
+        savePlayers({
             "Zhanshen_": {
                 overall: "HT1",
                 sword: "HT1",
@@ -45,9 +46,7 @@ function getHead(name) {
                 mace: "LT1",
                 crystal: "LT3"
             }
-        };
-
-        savePlayers(defaultData);
+        });
     }
 
 })();
@@ -107,6 +106,16 @@ function loadLeaderboard() {
 }
 
 // ===========================
+// SEARCH IMPROVEMENTS
+// ===========================
+
+function handleSearchKey(event) {
+    if (event.key === "Enter") {
+        searchPlayer();
+    }
+}
+
+// ===========================
 // SEARCH PLAYER
 // ===========================
 
@@ -118,7 +127,7 @@ function searchPlayer() {
     const result = document.getElementById("searchResult");
 
     if (!name) {
-        result.innerHTML = `<span style="color:#ff6a00;">Enter a username</span>`;
+        result.innerHTML = `<span style="color:#ff6a00;">Type a username first</span>`;
         return;
     }
 
@@ -130,6 +139,7 @@ function searchPlayer() {
             <br>
             <span style="color:#ff6a00;">Not found</span>
         `;
+        result.scrollIntoView({ behavior: "smooth" });
         return;
     }
 
@@ -147,6 +157,8 @@ function searchPlayer() {
         Mace: <span class="tier-badge ${p.mace.toLowerCase()}">${p.mace}</span><br><br>
         Crystal: <span class="tier-badge ${p.crystal.toLowerCase()}">${p.crystal}</span>
     `;
+
+    result.scrollIntoView({ behavior: "smooth" });
 }
 
 // ===========================
