@@ -1,18 +1,30 @@
+// ===========================
+// API CONFIG
+// ===========================
+
+const API_URL = "https://tier-api.onrender.com";
 
 // ===========================
-// DATABASE
+// DATABASE (NOW ONLINE)
 // ===========================
 
-function getPlayers() {
-    return JSON.parse(localStorage.getItem("players") || "{}");
+async function getPlayers() {
+    try {
+        const res = await fetch(`${API_URL}/players`);
+        return await res.json();
+    } catch (err) {
+        console.error("Failed to fetch players:", err);
+        return {};
+    }
 }
 
-function savePlayers(data) {
-    localStorage.setItem("players", JSON.stringify(data));
+// ❌ no more localStorage save (handled by Minecraft/API)
+function savePlayers() {
+    console.warn("Save is handled by API (Skript / server)");
 }
 
 // ===========================
-// PLAYER HEAD
+// HEADS
 // ===========================
 
 const STEVE = "https://minotar.net/avatar/steve/64";
@@ -22,42 +34,65 @@ function getHead(name) {
 }
 
 // ===========================
-// INIT DATA
+// OVERALL RANK SYSTEM
 // ===========================
 
-(function initData() {
+function getOverallRank(p) {
 
-    const players = getPlayers();
+    const scores = {
+        HT1: 6,
+        HT2: 5,
+        HT3: 4,
+        LT1: 3,
+        LT2: 2,
+        LT3: 1
+    };
 
-    if (!players || Object.keys(players).length === 0) {
+    const kits = [
+        p.sword,
+        p.axe,
+        p.spearMace,
+        p.elytraMace,
+        p.crystal
+    ];
 
-        savePlayers({
-            "Zhanshen_": {
-                overall: "HT1",
-                sword: "HT1",
-                axe: "HT2",
-                mace: "LT1",
-                crystal: "HT2"
-            },
-            ".StuckRhino6771": {
-                overall: "LT1",
-                sword: "LT1",
-                axe: "LT2",
-                mace: "LT1",
-                crystal: "LT3"
-            }
-        });
+    let filled = 0;
+    let total = 0;
+
+    for (const rank of kits) {
+        if (rank && scores[rank]) filled++;
     }
 
-})();
+    // ❗ not fully tested
+    if (filled < kits.length) {
+        return "UNRANKED";
+    }
+
+    for (const rank of kits) {
+        total += scores[rank];
+    }
+
+    const avg = Math.round(total / kits.length);
+
+    const tiers = {
+        6: "HT1",
+        5: "HT2",
+        4: "HT3",
+        3: "LT1",
+        2: "LT2",
+        1: "LT3"
+    };
+
+    return tiers[avg] || "UNRANKED";
+}
 
 // ===========================
 // LEADERBOARD
 // ===========================
 
-function loadLeaderboard() {
+async function loadLeaderboard() {
 
-    const players = getPlayers();
+    const players = await getPlayers();
 
     const container = document.getElementById("leaderboardContainer");
     const count = document.getElementById("rankedPlayersCount");
@@ -67,98 +102,111 @@ function loadLeaderboard() {
     count.textContent = names.length;
     container.innerHTML = "";
 
-    if (names.length === 0) {
-        container.innerHTML = `
-            <div class="row">
-                <div class="rank">-</div>
-                <div>No ranked players yet</div>
-                <div>-</div>
-            </div>
-        `;
-        return;
-    }
-
     names.forEach((name, i) => {
 
         const p = players[name];
+        const overall = getOverallRank(p);
 
         container.innerHTML += `
-            <div class="row">
+        <div class="row">
 
-                <div class="rank">#${i + 1}</div>
+            <div class="rank">#${i + 1}</div>
 
-                <div class="player-info">
-                    <img class="player-head"
-                         src="${getHead(name)}"
-                         onerror="this.src='${STEVE}'">
-                    ${name}
-                </div>
-
-                <div>
-                    <span class="tier-badge ${p.overall.toLowerCase()}">
-                        ${p.overall}
-                    </span>
-                </div>
-
+            <div class="player-info">
+                <img class="player-head"
+                     src="${getHead(name)}"
+                     onerror="this.src='${STEVE}'">
+                ${name}
             </div>
-        `;
+
+            <div>
+                <span class="tier-badge ${overall.toLowerCase()}">
+                    ${overall}
+                </span>
+            </div>
+
+        </div>`;
     });
-}
-
-// ===========================
-// SEARCH IMPROVEMENTS
-// ===========================
-
-function handleSearchKey(event) {
-    if (event.key === "Enter") {
-        searchPlayer();
-    }
 }
 
 // ===========================
 // SEARCH PLAYER
 // ===========================
 
-function searchPlayer() {
+async function searchPlayer() {
 
-    const players = getPlayers();
+    const players = await getPlayers();
 
-    const name = document.getElementById("playerInput").value.trim();
+    const input = document.getElementById("playerInput").value.trim().toLowerCase();
     const result = document.getElementById("searchResult");
 
-    if (!name) {
-        result.innerHTML = `<span style="color:#ff6a00;">Type a username first</span>`;
-        return;
-    }
+    const matchKey = Object.keys(players).find(name =>
+        name.toLowerCase().includes(input)
+    );
 
-    const p = players[name];
-
-    if (!p) {
+    if (!matchKey) {
         result.innerHTML = `
-            <h2>${name}</h2>
+            <h2>${input}</h2>
             <br>
-            <span style="color:#ff6a00;">Not found</span>
+            <span style="color:#ff6a00;">No player found.</span>
         `;
-        result.scrollIntoView({ behavior: "smooth" });
         return;
     }
+
+    const p = players[matchKey];
+    const overall = getOverallRank(p);
 
     result.innerHTML = `
         <div class="player-info" style="justify-content:center;">
-            <img class="player-head" src="${getHead(name)}">
-            <h2>${name}</h2>
+            <img class="player-head"
+                 src="${getHead(matchKey)}"
+                 onerror="this.src='${STEVE}'">
+            <h2>${matchKey}</h2>
         </div>
 
         <br><br>
 
-        Overall: <span class="tier-badge ${p.overall.toLowerCase()}">${p.overall}</span><br><br>
-        Sword: <span class="tier-badge ${p.sword.toLowerCase()}">${p.sword}</span><br><br>
-        Axe: <span class="tier-badge ${p.axe.toLowerCase()}">${p.axe}</span><br><br>
-        Mace: <span class="tier-badge ${p.mace.toLowerCase()}">${p.mace}</span><br><br>
-        Crystal: <span class="tier-badge ${p.crystal.toLowerCase()}">${p.crystal}</span>
-    `;
+        Overall: <span class="tier-badge ${overall.toLowerCase()}">${overall}</span><br><br>
 
-    result.scrollIntoView({ behavior: "smooth" });
+        Sword: ${p.sword || "UNTESTED"}<br>
+        Axe: ${p.axe || "UNTESTED"}<br>
+        SpearMace: ${p.spearMace || "UNTESTED"}<br>
+        ElytraMace: ${p.elytraMace || "UNTESTED"}<br>
+        Crystal: ${p.crystal || "UNTESTED"}
+    `;
+}
+
+// ===========================
+// AUTOCOMPLETE
+// ===========================
+
+async function showSuggestions() {
+
+    const players = await getPlayers();
+
+    const input = document.getElementById("playerInput").value.toLowerCase();
+    const box = document.getElementById("suggestions");
+
+    if (!input) {
+        box.innerHTML = "";
+        return;
+    }
+
+    const matches = Object.keys(players)
+        .filter(name => name.toLowerCase().includes(input))
+        .slice(0, 6);
+
+    box.innerHTML = matches.map(name => `
+        <div class="suggestion-item" onclick="selectPlayer('${name}')">
+            ${name}
+        </div>
+    `).join("");
+}
+
+function selectPlayer(name) {
+    document.getElementById("playerInput").value = name;
+    document.getElementById("suggestions").innerHTML = "";
+    searchPlayer();
 }
 
 // ===========================
