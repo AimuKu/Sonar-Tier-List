@@ -414,4 +414,5 @@ function scrollToPlayers() {
 // INIT
 // ===========================
 
+console.log("Script Loaded");
 loadLeaderboard();
