@@ -284,4 +284,3 @@ async function searchPlayer() {
 // ===========================
 console.log("INIT OK");
 loadLeaderboard();
-
