@@ -1,5 +1,7 @@
+/* =========================
+   GLOBAL
+========================= */
 
-/* GLOBAL */
 html {
     scroll-behavior: smooth;
 }
@@ -16,7 +18,10 @@ body {
     color: white;
 }
 
-/* NAV */
+/* =========================
+   NAV
+========================= */
+
 nav {
     height: 80px;
     display: flex;
@@ -45,13 +50,17 @@ nav {
     text-decoration: none;
 }
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
+
 .hero {
     min-height: 80vh;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    padding: 20px;
 }
 
 .hero h1 {
@@ -66,13 +75,17 @@ nav {
     margin-top: 10px;
 }
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
+
 .btn {
     padding: 14px 25px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     margin: 5px;
+    transition: 0.2s;
 }
 
 .btn-primary {
@@ -85,19 +98,29 @@ nav {
     color: white;
 }
 
-/* SECTIONS */
-.section-title {
-    text-align: center;
-    margin: 40px 0;
-    font-size: 2rem;
+.btn:hover {
+    transform: scale(1.05);
 }
+
+/* =========================
+   SECTIONS
+========================= */
 
 #leaderboard,
 #players {
     padding: 60px 8%;
 }
 
-/* LEADERBOARD */
+.section-title {
+    text-align: center;
+    margin: 40px 0;
+    font-size: 2rem;
+}
+
+/* =========================
+   LEADERBOARD
+========================= */
+
 .leaderboard {
     background: #171717;
     border-radius: 12px;
@@ -118,7 +141,6 @@ nav {
     font-weight: bold;
 }
 
-/* PLAYER INFO */
 .player-info {
     display: flex;
     align-items: center;
@@ -131,7 +153,10 @@ nav {
     border-radius: 6px;
 }
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
+
 .search-box {
     text-align: center;
 }
@@ -143,6 +168,7 @@ nav {
     border-radius: 10px;
     background: #222;
     color: white;
+    outline: none;
 }
 
 .search-box button {
@@ -160,23 +186,53 @@ nav {
     margin-top: 25px;
 }
 
-/* TIER BADGES */
+/* =========================
+   TIER BADGES (HT1 → LT3)
+========================= */
+
 .tier-badge {
     padding: 6px 14px;
     border-radius: 999px;
     font-weight: bold;
+    display: inline-block;
 }
 
+/* Highest → Lowest */
 .ht1 { background: #ff3b30; color: white; }
-.lt1 { background: #ff7a00; color: white; }
-.ht2 { background: #ffb300; color: black; }
-.lt2 { background: #cddc39; color: black; }
-.ht3 { background: #00c853; color: white; }
-.lt3 { background: #00acc1; color: white; }
+.ht2 { background: #ff6a00; color: white; }
+.ht3 { background: #ffb300; color: black; }
 
-/* ===========================
-   MOBILE CARD UI
-   =========================== */
+.lt1 { background: #cddc39; color: black; }
+.lt2 { background: #00acc1; color: white; }
+.lt3 { background: #555; color: white; }
+
+/* =========================
+   AUTOCOMPLETE
+========================= */
+
+#suggestions {
+    width: 300px;
+    margin: 10px auto;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #222;
+}
+
+.suggestion-item:hover {
+    background: #222;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 768px) {
 
     nav {
@@ -188,8 +244,8 @@ nav {
     }
 
     .links {
-        justify-content: center;
         flex-wrap: wrap;
+        justify-content: center;
     }
 
     .hero h1 {
@@ -197,7 +253,6 @@ nav {
     }
 
     .hero {
-        padding: 40px 20px;
         min-height: 60vh;
     }
 
@@ -206,21 +261,15 @@ nav {
         padding: 30px 15px;
     }
 
-    /* CARD MODE */
+    /* CARD STYLE ROW */
     .row {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
         background: #171717;
         margin: 10px 0;
         padding: 14px;
         border-radius: 12px;
-        border: 1px solid #222;
         gap: 10px;
-    }
-
-    .player-info {
-        width: 100%;
     }
 
     .search-box input {
@@ -232,5 +281,10 @@ nav {
         width: 100%;
         max-width: 280px;
         margin-top: 10px;
+    }
+
+    #suggestions {
+        width: 100%;
+        max-width: 280px;
     }
 }
