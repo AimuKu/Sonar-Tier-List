@@ -11,7 +11,75 @@ const API_URL = "https://tier-api.onrender.com";
 async function getPlayers() {
     try {
         const res = await fetch(`${API_URL}/players`);
-        return await res.json();
+        const data = await res.json();
+
+        // DEBUG PLAYERS
+        data["Debug_HT1"] = {
+            sword: "HT1",
+            axe: "HT1",
+            spearMace: "HT1",
+            elytraMace: "HT1",
+            crystal: "HT1"
+        };
+
+        data["Debug_HT2"] = {
+            sword: "HT2",
+            axe: "HT2",
+            spearMace: "HT2",
+            elytraMace: "HT2",
+            crystal: "HT2"
+        };
+
+        data["Debug_HT3"] = {
+            sword: "HT3",
+            axe: "HT3",
+            spearMace: "HT3",
+            elytraMace: "HT3",
+            crystal: "HT3"
+        };
+
+        data["Debug_LT1"] = {
+            sword: "LT1",
+            axe: "LT1",
+            spearMace: "LT1",
+            elytraMace: "LT1",
+            crystal: "LT1"
+        };
+
+        data["Debug_LT2"] = {
+            sword: "LT2",
+            axe: "LT2",
+            spearMace: "LT2",
+            elytraMace: "LT2",
+            crystal: "LT2"
+        };
+
+        data["Debug_LT3"] = {
+            sword: "LT3",
+            axe: "LT3",
+            spearMace: "LT3",
+            elytraMace: "LT3",
+            crystal: "LT3"
+        };
+
+        data["Debug_Unranked_1"] = {
+            sword: "HT1",
+            axe: null,
+            spearMace: null,
+            elytraMace: null,
+            crystal: null
+        };
+
+        data["Debug_Unranked_2"] = {
+            sword: "HT1",
+            axe: "HT2",
+            spearMace: "HT3",
+            elytraMace: null,
+            crystal: null
+        };
+
+        return data;
+
     } catch (err) {
         console.error("Failed to fetch players:", err);
         return {};
