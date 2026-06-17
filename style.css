@@ -205,6 +205,7 @@ nav {
 .lt1 { background: #cddc39; color: black; }
 .lt2 { background: #00acc1; color: white; }
 .lt3 { background: #555; color: white; }
+.unranked { background: #2f2f2f; color: white; }
 
 /* =========================
    AUTOCOMPLETE
