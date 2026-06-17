@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Tier List</title>
+    <title>SonarMC Tier List</title>
 
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
@@ -12,7 +10,9 @@
 
 <body>
 
-<!-- NAV -->
+<!-- =========================
+     NAV
+========================= -->
 <nav>
     <div class="logo">Tier List</div>
 
@@ -22,18 +22,27 @@
     </div>
 </nav>
 
-<!-- HERO -->
+<!-- =========================
+     HERO
+========================= -->
 <div class="hero">
     <div>
-        <h1>Minecraft Tier List</h1>
-        <p>Ranked players database</p>
+        <h1>SonarMC Tier List</h1>
+        <p>Ranked players database (HT1 → LT3)</p>
 
-        <button class="btn btn-primary" onclick="scrollToLeaderboard()">View Leaderboard</button>
-        <button class="btn btn-secondary" onclick="scrollToPlayers()">Search Players</button>
+        <button class="btn btn-primary" onclick="scrollToLeaderboard()">
+            View Leaderboard
+        </button>
+
+        <button class="btn btn-secondary" onclick="scrollToPlayers()">
+            Search Players
+        </button>
     </div>
 </div>
 
-<!-- LEADERBOARD -->
+<!-- =========================
+     LEADERBOARD
+========================= -->
 <section id="leaderboard">
 
     <h2 class="section-title">
@@ -44,15 +53,28 @@
 
 </section>
 
-<!-- SEARCH -->
+<!-- =========================
+     PLAYERS SEARCH
+========================= -->
 <section id="players">
 
     <h2 class="section-title">Search Player</h2>
 
-    <div class="search-box">
-        <input id="playerInput" placeholder="Enter username"
-               onkeydown="handleSearchKey(event)">
-        <button onclick="searchPlayer()">Search</button>
+    <div class="search-wrapper">
+
+        <!-- autocomplete -->
+        <div id="suggestions"></div>
+
+        <div class="search-box">
+            <input
+                id="playerInput"
+                placeholder="Enter username"
+                oninput="showSuggestions()"
+            >
+
+            <button onclick="searchPlayer()">Search</button>
+        </div>
+
     </div>
 
     <div id="searchResult" class="search-result"></div>
