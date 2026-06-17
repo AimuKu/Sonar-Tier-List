@@ -5,7 +5,7 @@
 const API_URL = "https://tier-api.onrender.com";
 
 // ===========================
-// DATABASE (NOW ONLINE)
+// DATABASE
 // ===========================
 
 async function getPlayers() {
@@ -18,9 +18,8 @@ async function getPlayers() {
     }
 }
 
-// ❌ no more localStorage save (handled by Minecraft/API)
 function savePlayers() {
-    console.warn("Save is handled by API (Skript / server)");
+    console.warn("Save is handled by API");
 }
 
 // ===========================
@@ -60,10 +59,11 @@ function getOverallRank(p) {
     let total = 0;
 
     for (const rank of kits) {
-        if (rank && scores[rank]) filled++;
+        if (rank && scores[rank]) {
+            filled++;
+        }
     }
 
-    // ❗ not fully tested
     if (filled < kits.length) {
         return "UNRANKED";
     }
@@ -87,6 +87,23 @@ function getOverallRank(p) {
 }
 
 // ===========================
+// TEST PROGRESS
+// ===========================
+
+function getTestedCount(player) {
+
+    const kits = [
+        player.sword,
+        player.axe,
+        player.spearMace,
+        player.elytraMace,
+        player.crystal
+    ];
+
+    return kits.filter(k => k).length;
+}
+
+// ===========================
 // LEADERBOARD
 // ===========================
 
@@ -97,15 +114,79 @@ async function loadLeaderboard() {
     const container = document.getElementById("leaderboardContainer");
     const count = document.getElementById("rankedPlayersCount");
 
-    const names = Object.keys(players);
-
-    count.textContent = names.length;
     container.innerHTML = "";
 
-    names.forEach((name, i) => {
+    const scores = {
+        HT1: 6,
+        HT2: 5,
+        HT3: 4,
+        LT1: 3,
+        LT2: 2,
+        LT3: 1
+    };
 
-        const p = players[name];
-        const overall = getOverallRank(p);
+    const sorted = Object.entries(players)
+        .map(([name, p]) => {
+
+            const overall = getOverallRank(p);
+
+            let score = 0;
+
+            if (overall !== "UNRANKED") {
+
+                const kits = [
+                    p.sword,
+                    p.axe,
+                    p.spearMace,
+                    p.elytraMace,
+                    p.crystal
+                ];
+
+                score = kits.reduce((total, kit) => {
+                    return total + (scores[kit] || 0);
+                }, 0);
+            }
+
+            return {
+                name,
+                player: p,
+                overall,
+                score,
+                tested: getTestedCount(p)
+            };
+        })
+        .sort((a, b) => {
+
+            // Ranked above unranked
+            if (a.overall === "UNRANKED" && b.overall !== "UNRANKED") {
+                return 1;
+            }
+
+            if (b.overall === "UNRANKED" && a.overall !== "UNRANKED") {
+                return -1;
+            }
+
+            // Higher score first
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+
+            // More tested kits first
+            if (b.tested !== a.tested) {
+                return b.tested - a.tested;
+            }
+
+            // Alphabetical
+            return a.name.localeCompare(b.name);
+        });
+
+    const rankedCount = sorted.filter(
+        p => p.overall !== "UNRANKED"
+    ).length;
+
+    count.textContent = rankedCount;
+
+    sorted.forEach((entry, i) => {
 
         container.innerHTML += `
         <div class="row">
@@ -114,14 +195,15 @@ async function loadLeaderboard() {
 
             <div class="player-info">
                 <img class="player-head"
-                     src="${getHead(name)}"
+                     src="${getHead(entry.name)}"
                      onerror="this.src='${STEVE}'">
-                ${name}
+
+                ${entry.name}
             </div>
 
             <div>
-                <span class="tier-badge ${overall.toLowerCase()}">
-                    ${overall}
+                <span class="tier-badge ${entry.overall.toLowerCase()}">
+                    ${entry.overall}
                 </span>
             </div>
 
@@ -137,7 +219,11 @@ async function searchPlayer() {
 
     const players = await getPlayers();
 
-    const input = document.getElementById("playerInput").value.trim().toLowerCase();
+    const input = document.getElementById("playerInput")
+        .value
+        .trim()
+        .toLowerCase();
+
     const result = document.getElementById("searchResult");
 
     const matchKey = Object.keys(players).find(name =>
@@ -145,28 +231,45 @@ async function searchPlayer() {
     );
 
     if (!matchKey) {
+
         result.innerHTML = `
             <h2>${input}</h2>
             <br>
-            <span style="color:#ff6a00;">No player found.</span>
+            <span style="color:#ff6a00;">
+                No player found.
+            </span>
         `;
+
         return;
     }
 
     const p = players[matchKey];
+
     const overall = getOverallRank(p);
+    const tested = getTestedCount(p);
 
     result.innerHTML = `
         <div class="player-info" style="justify-content:center;">
             <img class="player-head"
                  src="${getHead(matchKey)}"
                  onerror="this.src='${STEVE}'">
+
             <h2>${matchKey}</h2>
         </div>
 
         <br><br>
 
-        Overall: <span class="tier-badge ${overall.toLowerCase()}">${overall}</span><br><br>
+        Overall:
+        <span class="tier-badge ${overall.toLowerCase()}">
+            ${overall}
+        </span>
+
+        <br>
+
+        Progress:
+        ${tested}/5 Kits Tested
+
+        <br><br>
 
         Sword: ${p.sword || "UNTESTED"}<br>
         Axe: ${p.axe || "UNTESTED"}<br>
@@ -184,7 +287,10 @@ async function showSuggestions() {
 
     const players = await getPlayers();
 
-    const input = document.getElementById("playerInput").value.toLowerCase();
+    const input = document.getElementById("playerInput")
+        .value
+        .toLowerCase();
+
     const box = document.getElementById("suggestions");
 
     if (!input) {
@@ -193,19 +299,24 @@ async function showSuggestions() {
     }
 
     const matches = Object.keys(players)
-        .filter(name => name.toLowerCase().includes(input))
+        .filter(name =>
+            name.toLowerCase().includes(input)
+        )
         .slice(0, 6);
 
     box.innerHTML = matches.map(name => `
-        <div class="suggestion-item" onclick="selectPlayer('${name}')">
+        <div class="suggestion-item"
+             onclick="selectPlayer('${name}')">
             ${name}
         </div>
     `).join("");
 }
 
 function selectPlayer(name) {
+
     document.getElementById("playerInput").value = name;
     document.getElementById("suggestions").innerHTML = "";
+
     searchPlayer();
 }
 
@@ -214,13 +325,19 @@ function selectPlayer(name) {
 // ===========================
 
 function scrollToLeaderboard() {
+
     document.getElementById("leaderboard")
-        .scrollIntoView({ behavior: "smooth" });
+        .scrollIntoView({
+            behavior: "smooth"
+        });
 }
 
 function scrollToPlayers() {
+
     document.getElementById("players")
-        .scrollIntoView({ behavior: "smooth" });
+        .scrollIntoView({
+            behavior: "smooth"
+        });
 }
 
 // ===========================
