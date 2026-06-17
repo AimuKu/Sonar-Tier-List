@@ -1,6 +1,8 @@
 // ===========================
 // API CONFIG
 // ===========================
+console.log("SCRIPT LOADED");
+
 
 const API_URL = "https://tier-api.onrender.com";
 
