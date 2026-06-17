@@ -225,28 +225,30 @@ async function loadLeaderboard() {
         })
         .sort((a, b) => {
 
-            // Ranked above unranked
-            if (a.overall === "UNRANKED" && b.overall !== "UNRANKED") {
-                return 1;
-            }
+    const tierOrder = {
+        HT1: 6,
+        HT2: 5,
+        HT3: 4,
+        LT1: 3,
+        LT2: 2,
+        LT3: 1,
+        UNRANKED: 0
+    };
 
-            if (b.overall === "UNRANKED" && a.overall !== "UNRANKED") {
-                return -1;
-            }
+    if (tierOrder[b.overall] !== tierOrder[a.overall]) {
+        return tierOrder[b.overall] - tierOrder[a.overall];
+    }
 
-            // Higher score first
-            if (b.score !== a.score) {
-                return b.score - a.score;
-            }
+    if (b.score !== a.score) {
+        return b.score - a.score;
+    }
 
-            // More tested kits first
-            if (b.tested !== a.tested) {
-                return b.tested - a.tested;
-            }
+    if (b.tested !== a.tested) {
+        return b.tested - a.tested;
+    }
 
-            // Alphabetical
-            return a.name.localeCompare(b.name);
-        });
+    return a.name.localeCompare(b.name);
+});
 
     const rankedCount = sorted.filter(
         p => p.overall !== "UNRANKED"
