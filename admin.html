@@ -358,6 +358,42 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+
+        /* MOBILE TABS */
+        .mobile-tabs {
+            display: none;
+            margin-bottom: 20px;
+            background: #111;
+            border: 1px solid #1e1e1e;
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            background: none;
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn.active {
+            background: linear-gradient(90deg, #800020, #ff6a00);
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-tabs { display: flex; }
+            .editor-card, .table-card { display: none; }
+            .editor-card.tab-active, .table-card.tab-active { display: block; }
+            .editor-card { position: static; }
+        }
+
         @media (max-width: 768px) {
             #adminPanel { padding: 20px 14px; }
             nav { padding: 0 5%; }
@@ -402,10 +438,16 @@
         <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 
+    <!-- MOBILE TABS -->
+    <div class="mobile-tabs">
+        <button class="tab-btn active" id="tabEditor" onclick="switchTab('editor')">✏️ Editor</button>
+        <button class="tab-btn" id="tabPlayers" onclick="switchTab('players')">👥 Players</button>
+    </div>
+
     <div class="main-grid">
 
         <!-- EDITOR -->
-        <div class="editor-card">
+        <div class="editor-card tab-active" id="editorCard">
             <h3>✏️ Edit Player</h3>
 
             <div class="player-input-wrap">
@@ -434,7 +476,7 @@
         </div>
 
         <!-- PLAYER TABLE -->
-        <div class="table-card">
+        <div class="table-card" id="tableCard">
             <div class="table-top">
                 <h3>👥 Players (<span id="playerCount">0</span>)</h3>
                 <input id="searchFilter" placeholder="Filter by name..." oninput="filterTable()">
@@ -587,6 +629,9 @@
     }
 
     function selectPlayer(name) {
+        // On mobile, switch to editor tab
+        if (window.innerWidth <= 900) switchTab('editor');
+
         document.getElementById("editorName").value = name;
         document.getElementById("editorHead").src = getHead(name);
         document.getElementById("editorSuggestions").style.display = "none";
@@ -721,6 +766,29 @@
         clearTimeout(el._t);
         el._t = setTimeout(() => { el.className = "feedback"; el.textContent = ""; }, 4000);
     }
+
+    // =========================
+    // MOBILE TABS
+    // =========================
+    function switchTab(tab) {
+        const editor = document.getElementById("editorCard");
+        const table = document.getElementById("tableCard");
+        const btnEditor = document.getElementById("tabEditor");
+        const btnPlayers = document.getElementById("tabPlayers");
+
+        if (tab === "editor") {
+            editor.classList.add("tab-active");
+            table.classList.remove("tab-active");
+            btnEditor.classList.add("active");
+            btnPlayers.classList.remove("active");
+        } else {
+            table.classList.add("tab-active");
+            editor.classList.remove("tab-active");
+            btnPlayers.classList.add("active");
+            btnEditor.classList.remove("active");
+        }
+    }
+
 </script>
 </body>
 </html>
