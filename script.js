@@ -26,25 +26,12 @@ async function getPlayers() {
                 Debug_LT1: mkPlayer("LT1"),
                 Debug_LT2: mkPlayer("LT2"),
                 Debug_LT3: mkPlayer("LT3"),
-                Debug_Unranked_1: {
-                    sword: "HT1",
-                    axe: null,
-                    spearMace: null,
-                    elytraMace: null,
-                    crystal: null
-                },
-                Debug_Unranked_2: {
-                    sword: "HT1",
-                    axe: "HT2",
-                    spearMace: "HT3",
-                    elytraMace: null,
-                    crystal: null
-                }
+                Debug_Unranked_1: { sword: "HT1", axe: null, spearMace: null, elytraMace: null, crystal: null },
+                Debug_Unranked_2: { sword: "HT1", axe: "HT2", spearMace: "HT3", elytraMace: null, crystal: null }
             });
         }
 
         return data;
-
     } catch (err) {
         console.error("Failed to fetch players:", err);
         return {};
@@ -52,13 +39,7 @@ async function getPlayers() {
 }
 
 function mkPlayer(tier) {
-    return {
-        sword: tier,
-        axe: tier,
-        spearMace: tier,
-        elytraMace: tier,
-        crystal: tier
-    };
+    return { sword: tier, axe: tier, spearMace: tier, elytraMace: tier, crystal: tier };
 }
 
 // ===========================
@@ -68,38 +49,56 @@ const STEVE = "https://minotar.net/avatar/steve/64";
 const getHead = (name) => `https://minotar.net/avatar/${name}/64`;
 
 // ===========================
-// TIER SYSTEM
+// KIT SCORES (HT1=6 → LT3=1)
 // ===========================
-const SCORE = {
-    HT1: 6,
-    HT2: 5,
-    HT3: 4,
-    LT1: 3,
-    LT2: 2,
-    LT3: 1
-};
+const KIT_SCORE = { HT1: 6, HT2: 5, HT3: 4, LT1: 3, LT2: 2, LT3: 1 };
 
 // ===========================
-// OVERALL RANK
+// OVERALL RANK (F → S+)
 // ===========================
 function getOverallRank(p) {
     const kits = [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal];
 
-    if (kits.some(k => !k)) return "UNRANKED";
+    if (kits.some(k => !k)) return "F";
 
-    const avg = Math.round(
-        kits.reduce((a, b) => a + SCORE[b], 0) / kits.length
-    );
+    const avg = kits.reduce((a, b) => a + KIT_SCORE[b], 0) / kits.length;
 
-    return Object.keys(SCORE).find(k => SCORE[k] === avg) || "UNRANKED";
+    if (avg >= 6)   return "S+";
+    if (avg >= 5)   return "S";
+    if (avg >= 4)   return "A";
+    if (avg >= 3)   return "B";
+    if (avg >= 2.5) return "C";
+    if (avg >= 1.5) return "D";
+    if (avg >= 1)   return "E";
+    return "F";
 }
+
+// ===========================
+// OVERALL ORDER
+// ===========================
+const OVERALL_ORDER = { "S+": 8, "S": 7, "A": 6, "B": 5, "C": 4, "D": 3, "E": 2, "F": 1 };
 
 // ===========================
 // TEST COUNT
 // ===========================
 function getTestedCount(p) {
-    return [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal]
-        .filter(Boolean).length;
+    return [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal].filter(Boolean).length;
+}
+
+// ===========================
+// KIT BADGE HTML
+// ===========================
+const KIT_LABELS = {
+    sword:      { label: "Sword",       icon: "⚔️" },
+    axe:        { label: "Axe",         icon: "🪓" },
+    spearMace:  { label: "Spear/Mace",  icon: "🔱" },
+    elytraMace: { label: "Elytra",      icon: "🦅" },
+    crystal:    { label: "Crystal",     icon: "💎" }
+};
+
+function kitBadge(rank) {
+    if (!rank) return `<span class="kit-badge unranked">—</span>`;
+    return `<span class="kit-badge ${rank.toLowerCase()}">${rank}</span>`;
 }
 
 // ===========================
@@ -107,44 +106,50 @@ function getTestedCount(p) {
 // ===========================
 async function loadLeaderboard() {
     const players = await getPlayers();
-
     const container = document.getElementById("leaderboardContainer");
     const count = document.getElementById("rankedPlayersCount");
 
     if (!container) return;
 
-    container.innerHTML = "";
-
     const sorted = Object.entries(players)
         .map(([name, p]) => {
-            const kits = [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal];
             const overall = getOverallRank(p);
-            const score = kits.reduce((t, k) => t + (SCORE[k] || 0), 0);
-            return { name, overall, score, tested: getTestedCount(p) };
+            const score = [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal]
+                .reduce((t, k) => t + (KIT_SCORE[k] || 0), 0);
+            return { name, p, overall, score, tested: getTestedCount(p) };
         })
         .sort((a, b) => {
-            const tierOrder = { HT1: 6, HT2: 5, HT3: 4, LT1: 3, LT2: 2, LT3: 1, UNRANKED: 0 };
-            if (tierOrder[b.overall] !== tierOrder[a.overall]) return tierOrder[b.overall] - tierOrder[a.overall];
+            if (OVERALL_ORDER[b.overall] !== OVERALL_ORDER[a.overall])
+                return OVERALL_ORDER[b.overall] - OVERALL_ORDER[a.overall];
             if (b.score !== a.score) return b.score - a.score;
             if (b.tested !== a.tested) return b.tested - a.tested;
             return a.name.localeCompare(b.name);
         });
 
-    count.textContent = sorted.filter(p => p.overall !== "UNRANKED").length;
+    count.textContent = sorted.filter(p => p.overall !== "F").length;
 
     container.innerHTML = sorted.map((p, i) => `
-        <div class="row">
-            <div class="rank">#${i + 1}</div>
-            <div class="player-info">
-                <img class="player-head"
-                    src="${getHead(p.name)}"
-                    onerror="this.src='${STEVE}'">
-                ${p.name}
+        <div class="lb-card">
+            <div class="lb-rank">#${i + 1}</div>
+
+            <img class="lb-head"
+                src="${getHead(p.name)}"
+                onerror="this.src='${STEVE}'">
+
+            <div class="lb-info">
+                <div class="lb-name">${p.name}</div>
+                <div class="lb-kits">
+                    ${Object.keys(KIT_LABELS).map(kit => `
+                        <span class="lb-kit-wrap" title="${KIT_LABELS[kit].label}">
+                            <span class="lb-kit-icon">${KIT_LABELS[kit].icon}</span>
+                            ${kitBadge(p.p[kit])}
+                        </span>
+                    `).join("")}
+                </div>
             </div>
-            <div>
-                <span class="tier-badge ${p.overall.toLowerCase()}">
-                    ${p.overall}
-                </span>
+
+            <div class="lb-overall overall-${p.overall.toLowerCase().replace("+", "plus")}">
+                ${p.overall}
             </div>
         </div>
     `).join("");
@@ -179,9 +184,7 @@ async function ensurePlayers() {
 async function showSuggestions() {
     const input = document.getElementById("playerInput").value.trim().toLowerCase();
     const box = document.getElementById("suggestions");
-
     box.innerHTML = "";
-
     if (!input) return;
 
     const players = await ensurePlayers();
@@ -213,7 +216,6 @@ async function searchPlayer() {
     const input = document.getElementById("playerInput").value.trim();
     const result = document.getElementById("searchResult");
     const suggestions = document.getElementById("suggestions");
-
     suggestions.innerHTML = "";
 
     if (!input) {
@@ -222,10 +224,8 @@ async function searchPlayer() {
     }
 
     result.innerHTML = `<p style="color:#666">Searching...</p>`;
-
     const players = await ensurePlayers();
 
-    // Case-insensitive match
     const key = Object.keys(players).find(
         name => name.toLowerCase() === input.toLowerCase()
     );
@@ -237,44 +237,28 @@ async function searchPlayer() {
 
     const p = players[key];
     const overall = getOverallRank(p);
+    const overallClass = "overall-" + overall.toLowerCase().replace("+", "plus");
 
-    const kitLabels = {
-        sword: "Sword",
-        axe: "Axe",
-        spearMace: "Spear / Mace",
-        elytraMace: "Elytra Mace",
-        crystal: "Crystal"
-    };
-
-    const kitsHTML = Object.entries(kitLabels).map(([kit, label]) => {
+    const kitsHTML = Object.entries(KIT_LABELS).map(([kit, { label, icon }]) => {
         const rank = p[kit];
-        const badgeClass = rank ? rank.toLowerCase() : "unranked";
-        const badgeText = rank || "—";
         return `
-            <div style="display:flex;justify-content:space-between;align-items:center;
-                padding:10px 0;border-bottom:1px solid #1a1a1a;">
-                <span style="color:#aaa">${label}</span>
-                <span class="tier-badge ${badgeClass}">${badgeText}</span>
+            <div class="search-kit-row">
+                <span class="search-kit-label">${icon} ${label}</span>
+                ${kitBadge(rank)}
             </div>
         `;
     }).join("");
 
     result.innerHTML = `
-        <div style="display:inline-block;background:#171717;border:1px solid #222;
-            border-radius:16px;padding:28px;min-width:300px;text-align:left;">
-
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-                <img src="${getHead(key)}" onerror="this.src='${STEVE}'"
-                    style="width:52px;height:52px;border-radius:10px;">
+        <div class="search-card">
+            <div class="search-card-header">
+                <img src="${getHead(key)}" onerror="this.src='${STEVE}'" class="search-head">
                 <div>
-                    <div style="font-size:1.2rem;font-weight:700">${key}</div>
-                    <span class="tier-badge ${overall.toLowerCase()}" style="margin-top:4px">
-                        ${overall}
-                    </span>
+                    <div class="search-name">${key}</div>
+                    <span class="overall-badge ${overallClass}">${overall}</span>
                 </div>
             </div>
-
-            ${kitsHTML}
+            <div class="search-kits">${kitsHTML}</div>
         </div>
     `;
 }
@@ -284,3 +268,4 @@ async function searchPlayer() {
 // ===========================
 console.log("INIT OK");
 loadLeaderboard();
+
