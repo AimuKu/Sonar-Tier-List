@@ -86,6 +86,7 @@ nav {
 .overall-d      { background: #00acc1; color: white; }
 .overall-e      { background: #555; color: white; }
 .overall-f      { background: #2f2f2f; color: #888; }
+.overall-unknown { background: #1a1a2e; color: #7c83ff; border: 1px solid #7c83ff44; }
 
 /* =========================
    KIT BADGES
@@ -285,3 +286,4 @@ nav {
 
     .search-card { min-width: unset; width: 100%; }
 }
+
