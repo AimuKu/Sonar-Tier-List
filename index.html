@@ -2,83 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SonarMC Tier List</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
-
 <body>
 
-<!-- =========================
-     NAV
-========================= -->
+<!-- NAV -->
 <nav>
     <div class="logo">Tier List</div>
-
     <div class="links">
         <a href="#leaderboard">Leaderboard</a>
         <a href="#players">Players</a>
     </div>
 </nav>
 
-<!-- =========================
-     HERO
-========================= -->
+<!-- HERO -->
 <div class="hero">
     <div>
         <h1>SonarMC Tier List</h1>
-        <p>Ranked players database (HT1 → LT3)</p>
-
-        <button class="btn btn-primary" onclick="scrollToLeaderboard()">
-            View Leaderboard
-        </button>
-
-        <button class="btn btn-secondary" onclick="scrollToPlayers()">
-            Search Players
-        </button>
+        <p>Ranked players database (F → S+)</p>
+        <div class="hero-btns">
+            <button class="btn btn-primary" onclick="scrollToLeaderboard()">View Leaderboard</button>
+            <button class="btn btn-secondary" onclick="scrollToPlayers()">Search Players</button>
+        </div>
     </div>
 </div>
 
-<!-- =========================
-     LEADERBOARD
-========================= -->
+<!-- LEADERBOARD -->
 <section id="leaderboard">
-
-    <h2 class="section-title">
-        Leaderboard (<span id="rankedPlayersCount">0</span>)
-    </h2>
-
-    <div class="leaderboard" id="leaderboardContainer"></div>
-
+    <h2 class="section-title">Leaderboard (<span id="rankedPlayersCount">0</span>)</h2>
+    <div class="leaderboard-wrap" id="leaderboardContainer"></div>
 </section>
 
-<!-- =========================
-     PLAYERS SEARCH
-========================= -->
+<!-- SEARCH -->
 <section id="players">
-
     <h2 class="section-title">Search Player</h2>
-
     <div class="search-wrapper">
-
-        <!-- autocomplete -->
-        <div id="suggestions"></div>
-
         <div class="search-box">
-            <input
-                id="playerInput"
-                placeholder="Enter username"
-                oninput="showSuggestions()"
-            >
-
+            <input id="playerInput" placeholder="Enter username" oninput="showSuggestions()"
+                onkeydown="if(event.key==='Enter') searchPlayer()">
             <button onclick="searchPlayer()">Search</button>
         </div>
-
+        <div id="suggestions"></div>
     </div>
-
     <div id="searchResult" class="search-result"></div>
-
 </section>
 
 </body>
