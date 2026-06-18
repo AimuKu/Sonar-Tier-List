@@ -126,7 +126,9 @@ async function loadLeaderboard() {
             return a.name.localeCompare(b.name);
         });
 
-    count.textContent = sorted.filter(p => p.overall !== "?").length;
+    const ranked = sorted.filter(p => p.overall !== "?").length;
+    const total = sorted.length;
+    count.textContent = `${ranked} ranked / ${total} total`;
 
     container.innerHTML = sorted.map((p, i) => `
         <div class="lb-card">
@@ -268,4 +270,3 @@ async function searchPlayer() {
 // ===========================
 console.log("INIT OK");
 loadLeaderboard();
-
