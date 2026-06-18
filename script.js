@@ -54,12 +54,12 @@ const getHead = (name) => `https://minotar.net/avatar/${name}/64`;
 const KIT_SCORE = { HT1: 6, HT2: 5, HT3: 4, LT1: 3, LT2: 2, LT3: 1 };
 
 // ===========================
-// OVERALL RANK (F → S+)
+// OVERALL RANK (? → S+)
 // ===========================
 function getOverallRank(p) {
     const kits = [p.sword, p.axe, p.spearMace, p.elytraMace, p.crystal];
 
-    if (kits.some(k => !k)) return "F";
+    if (kits.some(k => !k)) return "?";
 
     const avg = kits.reduce((a, b) => a + KIT_SCORE[b], 0) / kits.length;
 
@@ -76,7 +76,7 @@ function getOverallRank(p) {
 // ===========================
 // OVERALL ORDER
 // ===========================
-const OVERALL_ORDER = { "S+": 8, "S": 7, "A": 6, "B": 5, "C": 4, "D": 3, "E": 2, "F": 1 };
+const OVERALL_ORDER = { "S+": 9, "S": 8, "A": 7, "B": 6, "C": 5, "D": 4, "E": 3, "F": 2, "?": 1 };
 
 // ===========================
 // TEST COUNT
@@ -126,7 +126,7 @@ async function loadLeaderboard() {
             return a.name.localeCompare(b.name);
         });
 
-    count.textContent = sorted.filter(p => p.overall !== "F").length;
+    count.textContent = sorted.filter(p => p.overall !== "?").length;
 
     container.innerHTML = sorted.map((p, i) => `
         <div class="lb-card">
@@ -148,7 +148,7 @@ async function loadLeaderboard() {
                 </div>
             </div>
 
-            <div class="lb-overall overall-${p.overall.toLowerCase().replace("+", "plus")}">
+            <div class="lb-overall overall-${p.overall.toLowerCase().replace("+", "plus").replace("?", "unknown")}">
                 ${p.overall}
             </div>
         </div>
@@ -237,7 +237,7 @@ async function searchPlayer() {
 
     const p = players[key];
     const overall = getOverallRank(p);
-    const overallClass = "overall-" + overall.toLowerCase().replace("+", "plus");
+    const overallClass = "overall-" + overall.toLowerCase().replace("+", "plus").replace("?", "unknown");
 
     const kitsHTML = Object.entries(KIT_LABELS).map(([kit, { label, icon }]) => {
         const rank = p[kit];
